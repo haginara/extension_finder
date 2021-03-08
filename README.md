@@ -39,6 +39,7 @@ pip install -r requirements.txt
 Just run `extension_finder.py` from within the virtual environment.
 
 ### Chrome Preferences JSON
+Preferences path: https://www.chromium.org/administrators/configuring-other-preferences
 
 Chrome will store all of its Extension information within a `Preferences` file, if `extension_finder` 
 can locate this file, you'll get good info from it:

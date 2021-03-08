@@ -3,8 +3,8 @@ Chrome.py -
 @brad_anton
 
 """
-from Browser import Browser
-from Extension import Extension
+from .Browser import Browser
+from .Extension import Extension
 
 from os import path, walk
 import json
@@ -27,12 +27,12 @@ class Chrome(Browser):
                     self.os.SLASH, 
                     self.os.CHROME_EXTENSIONS_PREFS)) 
             except (KeyError, IOError):
-                print '[+] Could not parse the Chrome Preferences JSON, falling back to extensions directory' 
+                print('[+] Could not parse the Chrome Preferences JSON, falling back to extensions directory' )
                 result = self.__check_app_directory('{}{}{}'.format(self.directory, 
                     self.os.SLASH, 
                     self.os.CHROME_EXTENSIONS))
         else:
-           print '[!] Could not find Chrome Extensions!'
+           print('[!] Could not find Chrome Extensions!')
 
         return result
         
