@@ -10,6 +10,12 @@ Lists all available information for a given extension. Currently supports:
 
 All features were tested on Windows 8.1 and MacOSX 10.11
 
+## Usage for onefile script
+
+```
+python ./chrome_extensions.py
+```
+
 ## Install
 
 With the repository cloned, create a virtual environment:
