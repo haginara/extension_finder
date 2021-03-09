@@ -7,6 +7,7 @@ Simple Script to identify which browser extensions are installed on a system.
 """
 from future import absolute_import
 from future import print_function
+
 import platform 
 from tabulate import tabulate
 
