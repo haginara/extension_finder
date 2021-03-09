@@ -3,6 +3,9 @@ Chrome.py -
 @brad_anton
 
 """
+from future import absolute_import
+from future import print_function
+
 from .Browser import Browser
 from .Extension import Extension
 
