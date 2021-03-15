@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 chrome_extensions.py
 @brad_anton
@@ -10,12 +11,16 @@ with a slash
 
 """
 
+import logging
+import sys
+import io
 import os
+import argparse
 import platform
+import csv
 import json
 
-from tabulate import tabulate
-
+logging.basicConfig(level=logging.WARNING, format="%(asctime)-15s | %(levelname)s | %(message)s")
 
 class MacBrowsers(object):
     SLASH = '/'
@@ -45,8 +50,19 @@ else:
     raise Exception("[!] Unsupported Operating System!!")
 
 
-def _check_preferences_json():
-    preferences = os.path.join(os.path.expanduser('~'), Browser.CHROME_EXTENSIONS_PREFS)
+def get_users():
+    users = []
+    if operating_system == 'Darwin':
+        for user in os.listdir('/Users'):
+            if user.startswith('.') or user == 'Shared':
+                continue
+            users.append(os.path.join('/Users', user))
+    
+    return users
+
+
+def _check_preferences_json(user_path):
+    preferences = os.path.join(user_path, Browser.CHROME_EXTENSIONS_PREFS)
     if not os.path.exists(preferences):
         raise Exception("No Chrome preference found")
     extensions = []
@@ -69,20 +85,21 @@ def _process_manifest_json(manifest_path):
     return name, version, extension_id
 
 
-def _check_app_directory():
-    app_directory = os.path.join(os.path.expanduser('~'), Browser.CHROME_EXTENSIONS)
+def _check_app_directory(user_path):
+    app_directory = os.path.join(user_path, Browser.CHROME_EXTENSIONS)
     if not os.path.exists(app_directory):
-        raise Exception("No Chrome app directory found")
+        logging.error("[-] No Chrome app directory found")
+        return
 
     extensions = []
     for root, dirs, files in os.walk(app_directory):
         for f in files:
             if f == 'manifest.json':
-                manifest = os.path.join(root, f)
+                manifest_path = os.path.join(root, f)
                 try:
-                    name, version, extension_id = _process_manifest_json(manifest)
+                    name, version, extension_id = _process_manifest_json(manifest_path)
                 except Exception as e:
-                    print(e)
+                    logging.error(e)
                     raise e
                 if name[0] == '_':
                     locale_paths = [
@@ -100,30 +117,51 @@ def _check_app_directory():
                                 if name is None:
                                     name = locale_manifest.get('app_name', {'message': None}).get('message')
                 extensions.append({
-                    'name': name,
+                    'name': "N/A" if name is None else unicode(name).encode("utf-8"),
                     'version': version,
-                    'path': None,
                     'id': extension_id,
+                    'manifest_path': "N/A" if manifest_path is None else unicode(manifest_path).encode("utf-8"),
                 })
     return extensions
-                                
 
-def find_extensions():
-    print("[+] Find Chrome extensions")
+
+def find_extensions(options):
+    logging.info("[+] Find Chrome extensions")
     if not os.path.exists(Browser.CHROME):
         raise Exception("Could not find chrome extensions")
-
-    try:
-        print("[+] Check Chrome preferences")
-        result = _check_preferences_json()
-    except Exception:
-        print('[-] Could not parse the Chrome preferences JSON')
-        result = _check_app_directory()
     
-    print(tabulate(result, headers='keys'))
+    results = []
+    users = get_users()
+    for user in users:
+        try:
+            logging.info("[+] Check Chrome preferences")
+            result = _check_preferences_json(user)
+        except Exception:
+            logging.error('[-] Could not parse the Chrome preferences JSON')
+            result = _check_app_directory(user)
+        if result is None:
+            result = []
+        results.extend(result)
+    with open(options.out, mode='w') as f:
+        if options.format == 'json':
+            result_raw = json.dumps(results, sort_keys=True, indent=2)
+            f.write(result_raw)
+        else:
+            writer = csv.DictWriter(f, delimiter='|', fieldnames=['name', 'id', 'version', 'manifest_path'])
+            writer.writeheader()
+            for row in results:
+                writer.writerow(row)
+    with open(options.out, 'r') as f:
+        print(f.read())
+
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-f' ,'--format', default='csv')
+    parser.add_argument('-o', '--out', default='chrome_extensions.out')
+
+    options = parser.parse_args()
     try:
-        find_extensions()
+        find_extensions(options)
     except Exception as e:
         raise SystemExit(e)
