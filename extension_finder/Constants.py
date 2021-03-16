@@ -8,9 +8,6 @@ Path names are prefexed by HOMEDIR unless starting
 with a slash
 
 """
-
-from enum import Enum
-
 import platform
 
 
@@ -28,7 +25,7 @@ class RegistryKey:
             self.hive = HKEY_CURRENT_USER
 
 
-class MacBrowsers(Enum):
+class MacBrowsers(object):
     SLASH = '/'
     CHROME = '/Applications/Google Chrome.app'
     CHROME_NAME = 'Chrome - MacOSX'
@@ -38,7 +35,7 @@ class MacBrowsers(Enum):
     SAFARI = '/Applications/Safari.app'
     IE = None
 
-class WinBrowsers(Enum):
+class WinBrowsers(object):
     SLASH = '\\'
     CHROME = r'C:\Program Files\Google\Chrome\Application\chrome.exe'
     CHROME_NAME = 'Chrome - Windows'

@@ -10,6 +10,12 @@ Lists all available information for a given extension. Currently supports:
 
 All features were tested on Windows 8.1 and MacOSX 10.11
 
+## Usage for onefile script
+
+```
+python ./chrome_extensions.py
+```
+
 ## Install
 
 With the repository cloned, create a virtual environment:
@@ -39,6 +45,7 @@ pip install -r requirements.txt
 Just run `extension_finder.py` from within the virtual environment.
 
 ### Chrome Preferences JSON
+Preferences path: https://www.chromium.org/administrators/configuring-other-preferences
 
 Chrome will store all of its Extension information within a `Preferences` file, if `extension_finder` 
 can locate this file, you'll get good info from it:

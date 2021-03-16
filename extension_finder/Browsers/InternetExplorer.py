@@ -3,8 +3,11 @@ InternetExplorer.py -
 @brad_anton
 
 """
-from Browser import Browser
-from Extension import Extension
+from future import absolute_import
+from future import print_function
+
+from .Browser import Browser
+from .Extension import Extension
 
 from os import path, walk
 try:
@@ -69,7 +72,7 @@ class InternetExplorer(Browser):
                     pass
            
         else:
-           print '[!] Could not find Internet Explorer Extensions!'
+           print('[!] Could not find Internet Explorer Extensions!')
 
         return extensions
       
